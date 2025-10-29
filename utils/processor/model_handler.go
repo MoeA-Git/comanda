@@ -2,6 +2,7 @@ package processor
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
 	"net/http"
@@ -34,7 +35,7 @@ func checkOllamaModelExists(modelName string) (bool, error) {
 		if strings.Contains(err.Error(), "connection refused") {
 			return false, fmt.Errorf("failed to connect to Ollama at http://localhost:11434 to verify model '%s'. Is Ollama running?", modelName)
 		}
-		return false, fmt.Errorf("error calling Ollama /api/tags to verify model '%s': %v", modelName, err)
+		return false, fmt.Errorf("error calling Ollama /api/tags to verify model '%s': %w", modelName, err)
 	}
 	defer resp.Body.Close()
 
@@ -45,12 +46,12 @@ func checkOllamaModelExists(modelName string) (bool, error) {
 
 	bodyBytes, err := io.ReadAll(resp.Body)
 	if err != nil {
-		return false, fmt.Errorf("error reading Ollama /api/tags response body while verifying model '%s': %v", modelName, err)
+		return false, fmt.Errorf("error reading Ollama /api/tags response body while verifying model '%s': %w", modelName, err)
 	}
 
 	var tagsResponse OllamaTagsResponse
 	if err := json.Unmarshal(bodyBytes, &tagsResponse); err != nil {
-		return false, fmt.Errorf("error unmarshaling Ollama /api/tags response while verifying model '%s': %v. Body: %s", modelName, err, string(bodyBytes))
+		return false, fmt.Errorf("error unmarshaling Ollama /api/tags response while verifying model '%s': %w. Body: %s", modelName, err, string(bodyBytes))
 	}
 
 	modelNameLower := strings.ToLower(modelName)
@@ -89,7 +90,7 @@ func checkOllamaModelExists(modelName string) (bool, error) {
 		availableModels[i] = m.Name
 	}
 	errMsg := fmt.Sprintf("model tag '%s' not found in local Ollama instance. Available models: %v. Try running 'ollama pull %s'", modelName, availableModels, modelName)
-	return false, fmt.Errorf(errMsg)
+	return false, errors.New(errMsg)
 }
 
 // validateModel checks if the specified model is supported and has the required capabilities
@@ -113,7 +114,7 @@ func (p *Processor) validateModel(modelNames []string, inputs []string) error {
 		if provider == nil {
 			errMsg := fmt.Sprintf("unsupported model: %s (no provider found)", modelName)
 			p.debugf("Validation failed: %s", errMsg)
-			return fmt.Errorf(errMsg)
+			return errors.New(errMsg)
 		}
 
 		// Check if the provider actually supports this model
@@ -121,7 +122,7 @@ func (p *Processor) validateModel(modelNames []string, inputs []string) error {
 		if !provider.SupportsModel(modelName) {
 			errMsg := fmt.Sprintf("unsupported model: %s (provider %s does not support it)", modelName, provider.Name())
 			p.debugf("Validation failed: %s", errMsg)
-			return fmt.Errorf(errMsg)
+			return errors.New(errMsg)
 		}
 		p.debugf("Provider %s confirmed support for model %s", provider.Name(), modelName)
 
@@ -156,12 +157,12 @@ func (p *Processor) validateModel(modelNames []string, inputs []string) error {
 			if strings.Contains(err.Error(), fmt.Sprintf("model %s not found for provider %s", modelName, providerName)) {
 				errMsg := fmt.Sprintf("model %s is supported by provider %s but is not enabled in your configuration. Use 'comanda configure' to add it.", modelName, providerName)
 				p.debugf("Configuration error: %s", errMsg)
-				return fmt.Errorf(errMsg)
+				return errors.New(errMsg)
 			}
 			// Otherwise, return the original configuration error
 			errMsg := fmt.Sprintf("failed to get model configuration for %s: %v", modelName, err)
 			p.debugf("Configuration error: %s", errMsg)
-			return fmt.Errorf(errMsg)
+			return errors.New(errMsg)
 		}
 		p.debugf("Successfully retrieved model configuration for %s", modelName)
 

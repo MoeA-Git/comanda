@@ -220,7 +220,7 @@ func New(envConfig *config.EnvConfig) (*http.Server, error) {
 
 	// Create data directory if it doesn't exist
 	if err := os.MkdirAll(serverConfig.DataDir, 0755); err != nil {
-		return nil, fmt.Errorf("error creating data directory: %v", err)
+		return nil, fmt.Errorf("error creating data directory: %w", err)
 	}
 
 	s := &Server{
@@ -308,7 +308,8 @@ func (s *Server) routes() {
 				sendJSONError(w, http.StatusMethodNotAllowed, "Method not allowed for this path")
 			}
 		case 2: // Path: /providers/{provider_name}/models or /providers/{provider_name}/available-models
-			if parts[1] == "models" {
+			switch parts[1] {
+			case "models":
 				switch r.Method {
 				case http.MethodGet:
 					s.handleGetConfiguredModels(w, r, providerName)
@@ -317,13 +318,13 @@ func (s *Server) routes() {
 				default:
 					sendJSONError(w, http.StatusMethodNotAllowed, "Method not allowed for /models path")
 				}
-			} else if parts[1] == "available-models" {
+			case "available-models":
 				if r.Method == http.MethodGet {
 					s.handleGetAvailableModels(w, r, providerName)
 				} else {
 					sendJSONError(w, http.StatusMethodNotAllowed, "Method not allowed for /available-models path")
 				}
-			} else {
+			default:
 				sendJSONError(w, http.StatusNotFound, "Invalid path")
 			}
 		case 3: // Path: /providers/{provider_name}/models/{model_name}
@@ -409,7 +410,7 @@ func Run(envConfig *config.EnvConfig) error {
 	}
 
 	if err := server.ListenAndServe(); err != nil && err != http.ErrServerClosed {
-		return fmt.Errorf("server failed to start: %v", err)
+		return fmt.Errorf("server failed to start: %w", err)
 	}
 
 	return nil

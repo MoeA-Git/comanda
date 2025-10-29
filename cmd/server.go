@@ -73,25 +73,25 @@ var showServerCmd = &cobra.Command{
 			return
 		}
 
-	server := envConfig.GetServerConfig()
-	log.Printf("\nServer Configuration:\n")
-	log.Printf("Port: %d\n", server.Port)
-	log.Printf("Data Directory: %s\n", server.DataDir)
-	log.Printf("Authentication Enabled: %v\n", server.Enabled)
-	if server.BearerToken != "" {
-		log.Printf("Bearer Token: %s\n", server.BearerToken)
-	}
+		server := envConfig.GetServerConfig()
+		log.Printf("\nServer Configuration:\n")
+		log.Printf("Port: %d\n", server.Port)
+		log.Printf("Data Directory: %s\n", server.DataDir)
+		log.Printf("Authentication Enabled: %v\n", server.Enabled)
+		if server.BearerToken != "" {
+			log.Printf("Bearer Token: %s\n", server.BearerToken)
+		}
 
-	// Display CORS configuration
-	log.Printf("\nCORS Configuration:\n")
-	log.Printf("Enabled: %v\n", server.CORS.Enabled)
-	if server.CORS.Enabled {
-		log.Printf("Allowed Origins: %s\n", strings.Join(server.CORS.AllowedOrigins, ", "))
-		log.Printf("Allowed Methods: %s\n", strings.Join(server.CORS.AllowedMethods, ", "))
-		log.Printf("Allowed Headers: %s\n", strings.Join(server.CORS.AllowedHeaders, ", "))
-		log.Printf("Max Age: %d seconds\n", server.CORS.MaxAge)
-	}
-	log.Printf("\n")
+		// Display CORS configuration
+		log.Printf("\nCORS Configuration:\n")
+		log.Printf("Enabled: %v\n", server.CORS.Enabled)
+		if server.CORS.Enabled {
+			log.Printf("Allowed Origins: %s\n", strings.Join(server.CORS.AllowedOrigins, ", "))
+			log.Printf("Allowed Methods: %s\n", strings.Join(server.CORS.AllowedMethods, ", "))
+			log.Printf("Allowed Headers: %s\n", strings.Join(server.CORS.AllowedHeaders, ", "))
+			log.Printf("Max Age: %d seconds\n", server.CORS.MaxAge)
+		}
+		log.Printf("\n")
 	},
 }
 
@@ -279,7 +279,7 @@ func configureServer(reader *bufio.Reader, envConfig *config.EnvConfig) error {
 	if portStr != "" {
 		port, err := strconv.Atoi(portStr)
 		if err != nil {
-			return fmt.Errorf("invalid port number: %v", err)
+			return fmt.Errorf("invalid port number: %w", err)
 		}
 		serverConfig.Port = port
 	}
@@ -294,7 +294,7 @@ func configureServer(reader *bufio.Reader, envConfig *config.EnvConfig) error {
 
 	// Create data directory if it doesn't exist
 	if err := os.MkdirAll(serverConfig.DataDir, 0755); err != nil {
-		return fmt.Errorf("error creating data directory: %v", err)
+		return fmt.Errorf("error creating data directory: %w", err)
 	}
 
 	// Prompt for bearer token generation
@@ -303,7 +303,7 @@ func configureServer(reader *bufio.Reader, envConfig *config.EnvConfig) error {
 	if strings.TrimSpace(strings.ToLower(genToken)) == "y" {
 		token, err := config.GenerateBearerToken()
 		if err != nil {
-			return fmt.Errorf("error generating bearer token: %v", err)
+			return fmt.Errorf("error generating bearer token: %w", err)
 		}
 		serverConfig.BearerToken = token
 		log.Printf("Generated bearer token: %s\n", token)
@@ -316,7 +316,7 @@ func configureServer(reader *bufio.Reader, envConfig *config.EnvConfig) error {
 
 	// Configure CORS settings
 	if err := configureCORS(reader, envConfig); err != nil {
-		return fmt.Errorf("error configuring CORS: %v", err)
+		return fmt.Errorf("error configuring CORS: %w", err)
 	}
 
 	envConfig.UpdateServerConfig(*serverConfig)
@@ -414,7 +414,7 @@ func configureCORS(reader *bufio.Reader, envConfig *config.EnvConfig) error {
 		if maxAgeStr != "" {
 			maxAge, err := strconv.Atoi(maxAgeStr)
 			if err != nil {
-				return fmt.Errorf("invalid max age: %v", err)
+				return fmt.Errorf("invalid max age: %w", err)
 			}
 			serverConfig.CORS.MaxAge = maxAge
 		} else {

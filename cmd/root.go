@@ -34,10 +34,10 @@ var rootCmd = &cobra.Command{
 	Long: `comanda is a command line tool that processes workflow configurations
 for model interactions and executes the specified actions.`,
 	PersistentPreRunE: func(cmd *cobra.Command, args []string) error {
-	// Configure log output format (remove timestamps for cleaner debug output)
+		// Configure log output format (remove timestamps for cleaner debug output)
 		if verbose {
 			log.SetFlags(0)
-			
+
 			// Optional: Set up file-based logging for debugging sessions
 			// This preserves logs even after the session ends
 			if logFileName := os.Getenv("COMANDA_LOG_FILE"); logFileName != "" {
@@ -51,7 +51,7 @@ for model interactions and executes the specified actions.`,
 				}
 			}
 		}
-		
+
 		// Ensure log file is properly closed on application exit (outside conditional)
 		defer func() {
 			if logFile != nil {
@@ -280,7 +280,7 @@ func Execute() {
 			cmdPath := strings.Trim(strings.TrimPrefix(errMsg, "unknown command"), `"`+` for "comanda"`)
 			// Check if the unknown command might be a filename intended for 'process'
 			if _, statErr := os.Stat(cmdPath); statErr == nil || os.IsNotExist(statErr) { // if it exists or looks like a path
-			log.Printf("To process a file, use the 'process' command:\n\n   comanda process %s\n\n", cmdPath)
+				log.Printf("To process a file, use the 'process' command:\n\n   comanda process %s\n\n", cmdPath)
 			} else {
 				fmt.Fprintln(os.Stderr, err) // Default error for other unknown commands
 			}

@@ -26,7 +26,7 @@ func GetOpenAIModels(apiKey string) ([]string, error) {
 	client := openai.NewClient(apiKey)
 	models, err := client.ListModels(context.Background())
 	if err != nil {
-		return nil, fmt.Errorf("error fetching OpenAI models: %v", err)
+		return nil, fmt.Errorf("error fetching OpenAI models: %w", err)
 	}
 
 	var allModels []string
@@ -114,7 +114,7 @@ func GetOllamaModels() ([]OllamaModel, error) {
 
 	resp, err := http.Get("http://localhost:11434/api/tags")
 	if err != nil {
-		return nil, fmt.Errorf("error connecting to Ollama API: %v", err)
+		return nil, fmt.Errorf("error connecting to Ollama API: %w", err)
 	}
 	defer resp.Body.Close()
 
@@ -127,7 +127,7 @@ func GetOllamaModels() ([]OllamaModel, error) {
 		Models []OllamaModel `json:"models"`
 	}
 	if err := json.NewDecoder(resp.Body).Decode(&response); err != nil {
-		return nil, fmt.Errorf("error decoding Ollama response: %v", err)
+		return nil, fmt.Errorf("error decoding Ollama response: %w", err)
 	}
 
 	return response.Models, nil
@@ -165,7 +165,7 @@ func GetVLLMModels() ([]VLLMModel, error) {
 	endpoint := "http://localhost:8000"
 	resp, err := http.Get(endpoint + "/v1/models")
 	if err != nil {
-		return nil, fmt.Errorf("error connecting to vLLM API: %v", err)
+		return nil, fmt.Errorf("error connecting to vLLM API: %w", err)
 	}
 	defer resp.Body.Close()
 
@@ -178,7 +178,7 @@ func GetVLLMModels() ([]VLLMModel, error) {
 		Data []VLLMModel `json:"data"`
 	}
 	if err := json.NewDecoder(resp.Body).Decode(&response); err != nil {
-		return nil, fmt.Errorf("error decoding vLLM response: %v", err)
+		return nil, fmt.Errorf("error decoding vLLM response: %w", err)
 	}
 
 	return response.Data, nil

@@ -101,7 +101,7 @@ func (g *GoogleProvider) SendPrompt(modelName string, prompt string) (string, er
 			ctx := context.Background()
 			client, err := genai.NewClient(ctx, option.WithAPIKey(g.apiKey))
 			if err != nil {
-				return "", fmt.Errorf("failed to create Google AI client: %v", err)
+				return "", fmt.Errorf("failed to create Google AI client: %w", err)
 			}
 			defer client.Close()
 
@@ -114,7 +114,7 @@ func (g *GoogleProvider) SendPrompt(modelName string, prompt string) (string, er
 			// Generate content
 			resp, err := model.GenerateContent(ctx, genai.Text(prompt))
 			if err != nil {
-				return "", fmt.Errorf("Google AI API error: %v", err)
+				return "", fmt.Errorf("Google AI API error: %w", err)
 			}
 
 			if len(resp.Candidates) == 0 {
@@ -161,7 +161,7 @@ func (g *GoogleProvider) SendPromptWithFile(modelName string, prompt string, fil
 	// Read the file content with size check - do this outside the retry loop
 	fileData, err := fileutil.SafeReadFile(file.Path)
 	if err != nil {
-		return "", fmt.Errorf("failed to read file: %v", err)
+		return "", fmt.Errorf("failed to read file: %w", err)
 	}
 
 	// Use retry mechanism for API calls
@@ -170,7 +170,7 @@ func (g *GoogleProvider) SendPromptWithFile(modelName string, prompt string, fil
 			ctx := context.Background()
 			client, err := genai.NewClient(ctx, option.WithAPIKey(g.apiKey))
 			if err != nil {
-				return "", fmt.Errorf("failed to create Google AI client: %v", err)
+				return "", fmt.Errorf("failed to create Google AI client: %w", err)
 			}
 			defer client.Close()
 
@@ -192,7 +192,7 @@ func (g *GoogleProvider) SendPromptWithFile(modelName string, prompt string, fil
 				if strings.Contains(err.Error(), "invalid UTF-8") {
 					return "", fmt.Errorf("encoding error in file %s: invalid UTF-8 characters detected", file.Path)
 				}
-				return "", fmt.Errorf("Google AI API error: %v", err)
+				return "", fmt.Errorf("Google AI API error: %w", err)
 			}
 
 			if len(resp.Candidates) == 0 {

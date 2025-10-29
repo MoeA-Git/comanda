@@ -103,9 +103,10 @@ func collectOutputFiles(stepNode *yaml.Node, outputFiles map[string]bool) {
 		value := stepNode.Content[i+1]
 
 		if key == "output" {
-			if value.Kind == yaml.ScalarNode {
+			switch value.Kind {
+			case yaml.ScalarNode:
 				outputFiles[value.Value] = true
-			} else if value.Kind == yaml.SequenceNode {
+			case yaml.SequenceNode:
 				for _, item := range value.Content {
 					outputFiles[item.Value] = true
 				}
@@ -227,13 +228,14 @@ func validateStep(t *testing.T, filename, stepName string, stepNode *yaml.Node, 
 
 			// Validate input paths if key is 'input'
 			if key == "input" {
-				if value.Kind == yaml.ScalarNode {
+				switch value.Kind {
+				case yaml.ScalarNode:
 					validateInputPath(t, filename, stepName, value.Value, outputFiles)
-				} else if value.Kind == yaml.SequenceNode {
+				case yaml.SequenceNode:
 					for _, item := range value.Content {
 						validateInputPath(t, filename, stepName, item.Value, outputFiles)
 					}
-				} else if value.Kind == yaml.MappingNode {
+				case yaml.MappingNode:
 					// For mapping nodes, validate as a web scraping input
 					validateWebScrapeInput(t, filename, stepName, value)
 					// Validation for database inputs will need to go here

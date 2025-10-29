@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
 	"log"
@@ -207,7 +208,7 @@ func handleProcess(w http.ResponseWriter, r *http.Request, serverConfig *config.
 				return
 			}
 			sw := &sseWriter{w: w, f: flusher}
-			sw.SendError(fmt.Errorf("Error reading YAML file: %v", err))
+			sw.SendError(fmt.Errorf("Error reading YAML file: %w", err))
 		} else {
 			w.Header().Set("Content-Type", "application/json")
 			w.WriteHeader(http.StatusBadRequest)
@@ -239,7 +240,7 @@ func handleProcess(w http.ResponseWriter, r *http.Request, serverConfig *config.
 				return
 			}
 			sw := &sseWriter{w: w, f: flusher}
-			sw.SendError(fmt.Errorf("Error parsing YAML file: %v", err))
+			sw.SendError(fmt.Errorf("Error parsing YAML file: %w", err))
 		} else {
 			json.NewEncoder(w).Encode(ProcessResponse{
 				Success: false,
@@ -420,7 +421,7 @@ func handleProcess(w http.ResponseWriter, r *http.Request, serverConfig *config.
 					errMsg := fmt.Sprintf("Processing failed: %v", err)
 					config.DebugLog("Streaming error: %s", errMsg)
 					if sw != nil {
-						sw.SendError(fmt.Errorf(errMsg))
+						sw.SendError(errors.New(errMsg))
 					}
 				} else {
 					config.DebugLog("Processing completed successfully")

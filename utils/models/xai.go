@@ -157,7 +157,7 @@ func (x *XAIProvider) SendPrompt(modelName string, prompt string) (string, error
 				if ctx.Err() == context.DeadlineExceeded {
 					return "", fmt.Errorf("request timed out after %v", defaultTimeout)
 				}
-				return "", fmt.Errorf("X.AI API error: %v", err)
+				return "", fmt.Errorf("X.AI API error: %w", err)
 			}
 
 			if len(resp.Choices) == 0 {
@@ -196,7 +196,7 @@ func (x *XAIProvider) SendPromptWithFile(modelName string, prompt string, file F
 	// Read the file content with size check - do this outside the retry loop
 	fileData, err := fileutil.SafeReadFile(file.Path)
 	if err != nil {
-		return "", fmt.Errorf("failed to read file: %v", err)
+		return "", fmt.Errorf("failed to read file: %w", err)
 	}
 
 	config := openai.DefaultConfig(x.apiKey)
@@ -245,7 +245,7 @@ func (x *XAIProvider) SendPromptWithFile(modelName string, prompt string, file F
 					if ctx.Err() == context.DeadlineExceeded {
 						return "", fmt.Errorf("request timed out after %v", defaultTimeout)
 					}
-					return "", fmt.Errorf("X.AI API error: %v", err)
+					return "", fmt.Errorf("X.AI API error: %w", err)
 				}
 
 				if len(resp.Choices) == 0 {
@@ -305,7 +305,7 @@ func (x *XAIProvider) SendPromptWithFile(modelName string, prompt string, file F
 				if ctx.Err() == context.DeadlineExceeded {
 					return "", fmt.Errorf("request timed out after %v", defaultTimeout)
 				}
-				return "", fmt.Errorf("X.AI API error: %v", err)
+				return "", fmt.Errorf("X.AI API error: %w", err)
 			}
 
 			if len(resp.Choices) == 0 {

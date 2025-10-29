@@ -1,6 +1,7 @@
 package processor
 
 import (
+	"errors"
 	"fmt"
 	"log"
 	"os"
@@ -125,14 +126,14 @@ func (p *Processor) handleOutput(modelName string, response string, outputs []st
 			}
 
 			// Write to file
-				p.debugf("[%s] Writing response to file: %s", modelName, outputPath)
+			p.debugf("[%s] Writing response to file: %s", modelName, outputPath)
 			p.debugf("[%s] Response length: %d characters", modelName, len(response))
 			p.debugf("[%s] First 100 characters: %s", modelName, response[:min(100, len(response))])
 
 			if err := os.WriteFile(outputPath, []byte(response), 0644); err != nil {
 				errMsg := fmt.Sprintf("failed to write response to file %s: %v", outputPath, err)
 				p.debugf(errMsg)
-				return fmt.Errorf(errMsg)
+				return errors.New(errMsg)
 			}
 			p.debugf("[%s] Response successfully written to file: %s", modelName, outputPath)
 

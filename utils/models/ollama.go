@@ -4,8 +4,8 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"log"
 	"io"
+	"log"
 	"net/http"
 	"strings"
 	"sync"
@@ -91,7 +91,7 @@ func (o *OllamaProvider) SendPrompt(modelName string, prompt string) (string, er
 
 	jsonData, err := json.Marshal(reqBody)
 	if err != nil {
-		return "", fmt.Errorf("error marshaling request: %v", err)
+		return "", fmt.Errorf("error marshaling request: %w", err)
 	}
 
 	o.debugf("Sending request to Ollama API: %s", string(jsonData))
@@ -103,7 +103,7 @@ func (o *OllamaProvider) SendPrompt(modelName string, prompt string) (string, er
 			resp, err := client.Post("http://localhost:11434/api/generate", "application/json", bytes.NewBuffer(jsonData))
 			if err != nil {
 				o.debugf("Error calling Ollama API: %v", err)
-				return "", fmt.Errorf("error calling Ollama API: %v (is Ollama running?)", err)
+				return "", fmt.Errorf("error calling Ollama API: %w (is Ollama running?)", err)
 			}
 			defer resp.Body.Close()
 
@@ -130,7 +130,7 @@ func (o *OllamaProvider) SendPrompt(modelName string, prompt string) (string, er
 						break
 					}
 					o.debugf("Error decoding response: %v", err)
-					return "", fmt.Errorf("error decoding response: %v", err)
+					return "", fmt.Errorf("error decoding response: %w", err)
 				}
 				o.debugf("Received response chunk: done=%v length=%d", ollamaResp.Done, len(ollamaResp.Response))
 				fullResponse.WriteString(ollamaResp.Response)
@@ -162,7 +162,7 @@ func (o *OllamaProvider) SendPromptWithFile(modelName string, prompt string, fil
 	// Read the file content with size check - do this outside the retry loop
 	fileData, err := fileutil.SafeReadFile(file.Path)
 	if err != nil {
-		return "", fmt.Errorf("failed to read file: %v", err)
+		return "", fmt.Errorf("failed to read file: %w", err)
 	}
 
 	// Combine file content with the prompt
@@ -177,7 +177,7 @@ func (o *OllamaProvider) SendPromptWithFile(modelName string, prompt string, fil
 
 	jsonData, err := json.Marshal(reqBody)
 	if err != nil {
-		return "", fmt.Errorf("error marshaling request: %v", err)
+		return "", fmt.Errorf("error marshaling request: %w", err)
 	}
 
 	// Use retry mechanism for API calls
@@ -186,7 +186,7 @@ func (o *OllamaProvider) SendPromptWithFile(modelName string, prompt string, fil
 			client := &http.Client{Timeout: 30 * time.Second} // Add a 30-second timeout
 			resp, err := client.Post("http://localhost:11434/api/generate", "application/json", bytes.NewBuffer(jsonData))
 			if err != nil {
-				return "", fmt.Errorf("error calling Ollama API: %v", err)
+				return "", fmt.Errorf("error calling Ollama API: %w", err)
 			}
 			defer resp.Body.Close()
 
@@ -210,7 +210,7 @@ func (o *OllamaProvider) SendPromptWithFile(modelName string, prompt string, fil
 					if err == io.EOF {
 						break
 					}
-					return "", fmt.Errorf("error decoding response: %v", err)
+					return "", fmt.Errorf("error decoding response: %w", err)
 				}
 				fullResponse.WriteString(ollamaResp.Response)
 				if ollamaResp.Done {
