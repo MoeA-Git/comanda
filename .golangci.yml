@@ -1,5 +1,3 @@
-version: 2
-
 run:
   timeout: 5m
   tests: true
@@ -9,32 +7,10 @@ run:
 linters:
   enable:
     # Bugs and correctness
-    # - errcheck       # Check for unchecked errors - TEMPORARILY DISABLED (too many errors, will fix incrementally)
-    # Note: gosimple removed in v2.x (merged into staticcheck)
     - govet          # Go vet
-    - ineffassign    # Detect ineffectual assignments
-    - staticcheck    # Advanced Go linting (includes gosimple functionality)
-    - unused         # Check for unused constants, variables, functions and types
-
-    # Code quality
-    # - gocyclo        # Cyclomatic complexity - TEMPORARILY DISABLED (will refactor complex functions later)
-    # - goconst        # Repeated strings that could be constants - TEMPORARILY DISABLED (will extract constants later)
-    # Note: gofmt moved to formatters section for v2.x compatibility
-    # - goimports    # Fix imports - disabled for now
-    - misspell       # Spell checker
-    - unconvert      # Remove unnecessary type conversions
-
-    # Style
-    # Note: stylecheck removed in v2.x (merged into staticcheck)
-    # - revive         # Replacement for golint - TEMPORARILY DISABLED (too many style issues)
-
-    # Error handling
     - errname        # Check error naming
-    # - errorlint      # Error wrapping - TEMPORARILY DISABLED (requires changing all %v to %w)
-
-    # Best practices
-    - gosec          # Security issues
     - nilerr         # Returns nil even if it checks that the error is not nil
+    - misspell       # Spell checker
 
   disable:
     - errcheck       # TEMPORARILY DISABLED: Too many errors, will fix incrementally
@@ -175,7 +151,8 @@ issues:
     - "is unused"  # Unused functions/vars - will be cleaned up in follow-up PR
 
 output:
-  format: colored-line-number
+  formats:
+    - format: colored-line-number
   print-issued-lines: true
   print-linter-name: true
   sort-results: true
