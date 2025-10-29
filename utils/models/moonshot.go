@@ -6,8 +6,8 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"log"
 	"io"
+	"log"
 	"net/http"
 	"strings"
 	"sync"
@@ -151,7 +151,7 @@ func (o *MoonshotProvider) SendPrompt(modelName string, prompt string) (string, 
 			resp, err := client.CreateChatCompletion(context.Background(), req)
 
 			if err != nil {
-				return "", fmt.Errorf("Moonshot API error: %v", err)
+				return "", fmt.Errorf("Moonshot API error: %w", err)
 			}
 
 			if len(resp.Choices) == 0 {
@@ -190,7 +190,7 @@ func (o *MoonshotProvider) SendPromptWithFile(modelName string, prompt string, f
 	// Read the file content with size check - do this outside the retry loop
 	fileData, err := fileutil.SafeReadFile(file.Path)
 	if err != nil {
-		return "", fmt.Errorf("failed to read file: %v", err)
+		return "", fmt.Errorf("failed to read file: %w", err)
 	}
 
 	// Create a custom client with the Moonshot base URL
@@ -216,7 +216,7 @@ func (o *MoonshotProvider) SendPromptWithFile(modelName string, prompt string, f
 			resp, err := client.CreateChatCompletion(context.Background(), req)
 
 			if err != nil {
-				return "", fmt.Errorf("Moonshot API error: %v", err)
+				return "", fmt.Errorf("Moonshot API error: %w", err)
 			}
 
 			if len(resp.Choices) == 0 {

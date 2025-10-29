@@ -5,8 +5,8 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
-	"log"
 	"io"
+	"log"
 	"net/http"
 	"strings"
 	"sync"
@@ -142,7 +142,7 @@ func (a *AnthropicProvider) SendPrompt(modelName string, prompt string) (string,
 
 	jsonData, err := json.Marshal(reqBody)
 	if err != nil {
-		return "", fmt.Errorf("failed to marshal request: %v", err)
+		return "", fmt.Errorf("failed to marshal request: %w", err)
 	}
 
 	// Use retry mechanism for API calls
@@ -150,7 +150,7 @@ func (a *AnthropicProvider) SendPrompt(modelName string, prompt string) (string,
 		func() (interface{}, error) {
 			req, err := http.NewRequest("POST", "https://api.anthropic.com/v1/messages", bytes.NewBuffer(jsonData))
 			if err != nil {
-				return "", fmt.Errorf("failed to create request: %v", err)
+				return "", fmt.Errorf("failed to create request: %w", err)
 			}
 
 			req.Header.Set("Content-Type", "application/json")
@@ -160,13 +160,13 @@ func (a *AnthropicProvider) SendPrompt(modelName string, prompt string) (string,
 			client := &http.Client{}
 			resp, err := client.Do(req)
 			if err != nil {
-				return "", fmt.Errorf("failed to send request: %v", err)
+				return "", fmt.Errorf("failed to send request: %w", err)
 			}
 			defer resp.Body.Close()
 
 			body, err := io.ReadAll(resp.Body)
 			if err != nil {
-				return "", fmt.Errorf("failed to read response: %v", err)
+				return "", fmt.Errorf("failed to read response: %w", err)
 			}
 
 			// Check for rate limit errors (429)
@@ -180,7 +180,7 @@ func (a *AnthropicProvider) SendPrompt(modelName string, prompt string) (string,
 
 			var response anthropicResponse
 			if err := json.Unmarshal(body, &response); err != nil {
-				return "", fmt.Errorf("failed to unmarshal response: %v", err)
+				return "", fmt.Errorf("failed to unmarshal response: %w", err)
 			}
 
 			if response.Error != nil {
@@ -228,7 +228,7 @@ func (a *AnthropicProvider) SendPromptWithFile(modelName string, prompt string, 
 	// Read the file content with size check - do this outside the retry loop
 	fileData, err := fileutil.SafeReadFile(file.Path)
 	if err != nil {
-		return "", fmt.Errorf("failed to read file: %v", err)
+		return "", fmt.Errorf("failed to read file: %w", err)
 	}
 
 	var content []anthropicContent
@@ -297,7 +297,7 @@ func (a *AnthropicProvider) SendPromptWithFile(modelName string, prompt string, 
 
 	jsonData, err := json.Marshal(reqBody)
 	if err != nil {
-		return "", fmt.Errorf("failed to marshal request: %v", err)
+		return "", fmt.Errorf("failed to marshal request: %w", err)
 	}
 
 	// Use retry mechanism for API calls
@@ -305,7 +305,7 @@ func (a *AnthropicProvider) SendPromptWithFile(modelName string, prompt string, 
 		func() (interface{}, error) {
 			req, err := http.NewRequest("POST", "https://api.anthropic.com/v1/messages", bytes.NewBuffer(jsonData))
 			if err != nil {
-				return "", fmt.Errorf("failed to create request: %v", err)
+				return "", fmt.Errorf("failed to create request: %w", err)
 			}
 
 			req.Header.Set("Content-Type", "application/json")
@@ -320,13 +320,13 @@ func (a *AnthropicProvider) SendPromptWithFile(modelName string, prompt string, 
 			client := &http.Client{}
 			resp, err := client.Do(req)
 			if err != nil {
-				return "", fmt.Errorf("failed to send request: %v", err)
+				return "", fmt.Errorf("failed to send request: %w", err)
 			}
 			defer resp.Body.Close()
 
 			body, err := io.ReadAll(resp.Body)
 			if err != nil {
-				return "", fmt.Errorf("failed to read response: %v", err)
+				return "", fmt.Errorf("failed to read response: %w", err)
 			}
 
 			// Check for rate limit errors (429)
@@ -340,7 +340,7 @@ func (a *AnthropicProvider) SendPromptWithFile(modelName string, prompt string, 
 
 			var response anthropicResponse
 			if err := json.Unmarshal(body, &response); err != nil {
-				return "", fmt.Errorf("failed to unmarshal response: %v", err)
+				return "", fmt.Errorf("failed to unmarshal response: %w", err)
 			}
 
 			if response.Error != nil {

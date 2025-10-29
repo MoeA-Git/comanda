@@ -2,6 +2,7 @@ package chunker
 
 import (
 	"bufio"
+	"errors"
 	"fmt"
 	"io"
 	"os"
@@ -131,7 +132,7 @@ func splitByLines(filePath, tempDir string, config ChunkConfig) ([]string, int, 
 
 	// If the file is empty, return an empty chunk
 	if lineCount == 0 {
-		chunkPath := filepath.Join(tempDir, fmt.Sprintf("chunk_0.txt"))
+		chunkPath := filepath.Join(tempDir, "chunk_0.txt")
 		if err := os.WriteFile(chunkPath, []byte(""), 0644); err != nil {
 			return nil, 0, fmt.Errorf("failed to write empty chunk: %w", err)
 		}
@@ -193,7 +194,7 @@ func splitByBytes(filePath, tempDir string, config ChunkConfig) ([]string, int, 
 
 	// If the file is empty, return an empty chunk
 	if fileSize == 0 {
-		chunkPath := filepath.Join(tempDir, fmt.Sprintf("chunk_0.txt"))
+		chunkPath := filepath.Join(tempDir, "chunk_0.txt")
 		if err := os.WriteFile(chunkPath, []byte(""), 0644); err != nil {
 			return nil, 0, fmt.Errorf("failed to write empty chunk: %w", err)
 		}
@@ -233,7 +234,7 @@ func splitByBytes(filePath, tempDir string, config ChunkConfig) ([]string, int, 
 		}
 
 		_, err = io.ReadFull(file, buffer)
-		if err != nil && err != io.EOF && err != io.ErrUnexpectedEOF {
+		if err != nil && !errors.Is(err, io.EOF) && !errors.Is(err, io.ErrUnexpectedEOF) {
 			return nil, 0, fmt.Errorf("failed to read chunk at position %d: %w", offset, err)
 		}
 
@@ -282,7 +283,7 @@ func splitByTokens(filePath, tempDir string, config ChunkConfig) ([]string, int,
 
 	// If the file is empty, return an empty chunk
 	if tokenCount == 0 {
-		chunkPath := filepath.Join(tempDir, fmt.Sprintf("chunk_0.txt"))
+		chunkPath := filepath.Join(tempDir, "chunk_0.txt")
 		if err := os.WriteFile(chunkPath, []byte(""), 0644); err != nil {
 			return nil, 0, fmt.Errorf("failed to write empty chunk: %w", err)
 		}

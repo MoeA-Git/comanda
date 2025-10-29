@@ -150,7 +150,7 @@ func (d *DeepseekProvider) SendPrompt(modelName string, prompt string) (string, 
 			resp, err := client.CreateChatCompletion(context.Background(), req)
 
 			if err != nil {
-				return "", fmt.Errorf("Deepseek API error: %v", err)
+				return "", fmt.Errorf("Deepseek API error: %w", err)
 			}
 
 			if len(resp.Choices) == 0 {
@@ -189,7 +189,7 @@ func (d *DeepseekProvider) SendPromptWithFile(modelName string, prompt string, f
 	// Read the file content with size check - do this outside the retry loop
 	fileData, err := fileutil.SafeReadFile(file.Path)
 	if err != nil {
-		return "", fmt.Errorf("failed to read file: %v", err)
+		return "", fmt.Errorf("failed to read file: %w", err)
 	}
 
 	config := openai.DefaultConfig(d.apiKey)
@@ -219,7 +219,7 @@ func (d *DeepseekProvider) SendPromptWithFile(modelName string, prompt string, f
 			resp, err := client.CreateChatCompletion(context.Background(), req)
 
 			if err != nil {
-				return "", fmt.Errorf("Deepseek API error: %v", err)
+				return "", fmt.Errorf("Deepseek API error: %w", err)
 			}
 
 			if len(resp.Choices) == 0 {
@@ -290,7 +290,7 @@ func (d *DeepseekProvider) handleFileAsVision(client *openai.Client, prompt stri
 	resp, err := client.CreateChatCompletion(context.Background(), req)
 
 	if err != nil {
-		return "", fmt.Errorf("Deepseek Vision API error: %v", err)
+		return "", fmt.Errorf("Deepseek Vision API error: %w", err)
 	}
 
 	if len(resp.Choices) == 0 {

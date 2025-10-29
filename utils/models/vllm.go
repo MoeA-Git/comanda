@@ -3,8 +3,8 @@ package models
 import (
 	"context"
 	"fmt"
-	"log"
 	"io"
+	"log"
 	"net/http"
 	"os"
 	"strings"
@@ -103,9 +103,9 @@ func (v *VLLMProvider) SendPrompt(modelName string, prompt string) (string, erro
 				v.debugf("Error calling vLLM API: %v", err)
 				// Check if it's a rate limit error
 				if strings.Contains(err.Error(), "429") {
-					return "", fmt.Errorf("API request failed with status 429: %v", err)
+					return "", fmt.Errorf("API request failed with status 429: %w", err)
 				}
-				return "", fmt.Errorf("error calling vLLM API: %v (is vLLM server running?)", err)
+				return "", fmt.Errorf("error calling vLLM API: %w (is vLLM server running?)", err)
 			}
 
 			if len(resp.Choices) == 0 {
@@ -135,7 +135,7 @@ func (v *VLLMProvider) SendPromptWithFile(modelName string, prompt string, file 
 	// Read the file content with size check - do this outside the retry loop
 	fileData, err := fileutil.SafeReadFile(file.Path)
 	if err != nil {
-		return "", fmt.Errorf("failed to read file: %v", err)
+		return "", fmt.Errorf("failed to read file: %w", err)
 	}
 
 	// For vLLM, we'll use a similar approach to Ollama - combine file content with prompt
@@ -184,7 +184,7 @@ func (v *VLLMProvider) checkVLLMServerHealth() error {
 	// Try to fetch models to verify server is running
 	resp, err := client.Get(v.endpoint + "/v1/models")
 	if err != nil {
-		return fmt.Errorf("vLLM server not reachable at %s: %v", v.endpoint, err)
+		return fmt.Errorf("vLLM server not reachable at %s: %w", v.endpoint, err)
 	}
 	defer resp.Body.Close()
 

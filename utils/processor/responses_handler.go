@@ -332,19 +332,21 @@ func (p *Processor) extractResponseID(response string) (string, error) {
 // sendProgressUpdate sends a progress update
 func (p *Processor) sendProgressUpdate(update ProgressUpdate) {
 	if update.IsParallel {
-		if update.Type == ProgressComplete {
+		switch update.Type {
+		case ProgressComplete:
 			p.emitParallelProgressWithMetrics(update.Message, update.Step, update.ParallelID, update.PerformanceMetrics)
-		} else if update.Type == ProgressError {
+		case ProgressError:
 			p.emitError(update.Error)
-		} else {
+		default:
 			p.emitParallelProgress(update.Message, update.Step, update.ParallelID)
 		}
 	} else {
-		if update.Type == ProgressComplete {
+		switch update.Type {
+		case ProgressComplete:
 			p.emitProgressWithMetrics(update.Message, update.Step, update.PerformanceMetrics)
-		} else if update.Type == ProgressError {
+		case ProgressError:
 			p.emitError(update.Error)
-		} else {
+		default:
 			p.emitProgress(update.Message, update.Step)
 		}
 	}

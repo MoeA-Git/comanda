@@ -2,6 +2,7 @@ package processor
 
 import (
 	"encoding/json"
+	"errors"
 	"flag"
 	"fmt"
 	"log"
@@ -572,7 +573,7 @@ func (p *Processor) Process() error {
 			p.spinner.Stop()
 			errMsg := fmt.Sprintf("Validation failed for step '%s': %v", step.Name, err)
 			p.debugf("Step validation error: %s", errMsg)
-			p.emitError(fmt.Errorf(errMsg))
+			p.emitError(errors.New(errMsg))
 			return fmt.Errorf("validation error: %w", err)
 		}
 
@@ -601,7 +602,7 @@ func (p *Processor) Process() error {
 				p.spinner.Stop()
 				errMsg := fmt.Sprintf("Validation failed for parallel step '%s': %v", step.Name, err)
 				p.debugf("Parallel step validation error: %s", errMsg)
-				p.emitError(fmt.Errorf(errMsg))
+				p.emitError(errors.New(errMsg))
 				return fmt.Errorf("validation error: %w", err)
 			}
 
@@ -624,7 +625,7 @@ func (p *Processor) Process() error {
 		p.spinner.Stop()
 		errMsg := fmt.Sprintf("Dependency validation failed: %v", err)
 		p.debugf("Dependency validation error: %s", errMsg)
-		p.emitError(fmt.Errorf(errMsg))
+		p.emitError(errors.New(errMsg))
 		return fmt.Errorf("dependency validation error: %w", err)
 	}
 
@@ -738,7 +739,7 @@ func (p *Processor) Process() error {
 			p.spinner.Stop()
 			errMsg := fmt.Sprintf("Error processing step '%s': %v", step.Name, err)
 			p.debugf("Step processing error: %s", errMsg)
-			p.emitError(fmt.Errorf(errMsg))
+			p.emitError(errors.New(errMsg))
 			return fmt.Errorf("step processing error: %w", err)
 		}
 
@@ -922,7 +923,7 @@ func (p *Processor) processStep(step Step, isParallel bool, parallelID string) (
 			if err != nil {
 				errMsg := fmt.Sprintf("Failed to chunk file '%s' for step '%s': %v", inputFile, step.Name, err)
 				p.debugf(errMsg)
-				return "", fmt.Errorf(errMsg)
+				return "", errors.New(errMsg)
 			}
 
 			p.debugf("Successfully chunked file '%s' into %d chunks", inputFile, chunkResult.TotalChunks)
@@ -959,7 +960,7 @@ func (p *Processor) processStep(step Step, isParallel bool, parallelID string) (
 	modelStartTime := time.Now()
 
 	// Skip model validation and provider configuration if model is NA
-	if !(len(modelNames) == 1 && modelNames[0] == "NA") {
+	if len(modelNames) != 1 || modelNames[0] != "NA" {
 		// Validate model for this step with detailed logging
 		p.debugf("Validating models for step '%s': models=%v inputs=%v", step.Name, modelNames, inputs)
 		if err := p.validateModel(modelNames, inputs); err != nil {

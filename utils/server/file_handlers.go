@@ -26,7 +26,7 @@ func (s *Server) ensureRuntimeDir(runtimeDir string) error {
 
 	runtimePath := filepath.Join(s.config.DataDir, runtimeDir)
 	if err := os.MkdirAll(runtimePath, 0755); err != nil {
-		return fmt.Errorf("error creating runtime directory: %v", err)
+		return fmt.Errorf("error creating runtime directory: %w", err)
 	}
 	return nil
 }
@@ -779,7 +779,7 @@ func (s *Server) handleYAMLProcess(w http.ResponseWriter, r *http.Request) {
 				return
 			}
 			sseWriter := &sseWriter{w: w, f: flusher}
-			sseWriter.SendError(fmt.Errorf("Error parsing YAML: %v", err))
+			sseWriter.SendError(fmt.Errorf("Error parsing YAML: %w", err))
 		} else {
 			w.Header().Set("Content-Type", "application/json")
 			w.WriteHeader(http.StatusBadRequest)

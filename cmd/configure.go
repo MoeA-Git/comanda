@@ -109,7 +109,7 @@ func getOpenAIModelsAndCategorize(apiKey string) ([]string, []string, error) {
 			apiModels[model.ID] = true
 		}
 	} else {
-			log.Printf("Warning: Could not fetch models from OpenAI API: %v\nFalling back to known models.\n", err)
+		log.Printf("Warning: Could not fetch models from OpenAI API: %v\nFalling back to known models.\n", err)
 	}
 
 	var primaryModels []string
@@ -172,7 +172,7 @@ func getOpenAIModels(apiKey string) ([]string, error) {
 	client := openai.NewClient(apiKey)
 	modelsList, err := client.ListModels(context.Background())
 	if err != nil {
-		return nil, fmt.Errorf("error fetching OpenAI models: %v", err)
+		return nil, fmt.Errorf("error fetching OpenAI models: %w", err)
 	}
 
 	var allModels []string
@@ -216,7 +216,7 @@ func getMoonshotModels() []string {
 func getOllamaModels() ([]OllamaModel, error) {
 	resp, err := http.Get("http://localhost:11434/api/tags")
 	if err != nil {
-		return nil, fmt.Errorf("error connecting to Ollama API: %v", err)
+		return nil, fmt.Errorf("error connecting to Ollama API: %w", err)
 	}
 	defer resp.Body.Close()
 
@@ -229,7 +229,7 @@ func getOllamaModels() ([]OllamaModel, error) {
 		Models []OllamaModel `json:"models"`
 	}
 	if err := json.NewDecoder(resp.Body).Decode(&models); err != nil {
-		return nil, fmt.Errorf("error decoding Ollama response: %v", err)
+		return nil, fmt.Errorf("error decoding Ollama response: %w", err)
 	}
 
 	return models.Models, nil
@@ -255,7 +255,7 @@ func getVLLMModels() ([]VLLMModel, error) {
 	endpoint := "http://localhost:8000"
 	resp, err := http.Get(endpoint + "/v1/models")
 	if err != nil {
-		return nil, fmt.Errorf("error connecting to vLLM API: %v", err)
+		return nil, fmt.Errorf("error connecting to vLLM API: %w", err)
 	}
 	defer resp.Body.Close()
 
@@ -268,7 +268,7 @@ func getVLLMModels() ([]VLLMModel, error) {
 		Data []VLLMModel `json:"data"`
 	}
 	if err := json.NewDecoder(resp.Body).Decode(&response); err != nil {
-		return nil, fmt.Errorf("error decoding vLLM response: %v", err)
+		return nil, fmt.Errorf("error decoding vLLM response: %w", err)
 	}
 
 	return response.Data, nil
@@ -319,7 +319,7 @@ func configureDatabase(reader *bufio.Reader, envConfig *config.EnvConfig) error 
 	} else {
 		port, err := strconv.Atoi(portStr)
 		if err != nil {
-			return fmt.Errorf("invalid port number: %v", err)
+			return fmt.Errorf("invalid port number: %w", err)
 		}
 		dbConfig.Port = port
 	}
@@ -331,7 +331,7 @@ func configureDatabase(reader *bufio.Reader, envConfig *config.EnvConfig) error 
 	// Use secure password prompt
 	password, err := config.PromptPassword("Enter database password: ")
 	if err != nil {
-		return fmt.Errorf("error reading password: %v", err)
+		return fmt.Errorf("error reading password: %w", err)
 	}
 	dbConfig.Password = password
 
@@ -345,7 +345,7 @@ func configureDatabase(reader *bufio.Reader, envConfig *config.EnvConfig) error 
 		// Create a database handler and test the connection
 		dbHandler := database.NewHandler(envConfig)
 		if err := dbHandler.TestConnection(dbName); err != nil {
-			return fmt.Errorf("connection test failed: %v", err)
+			return fmt.Errorf("connection test failed: %w", err)
 		}
 		log.Printf("%s Database connection successful!\n", greenCheckmark)
 	}
@@ -500,7 +500,7 @@ func promptForOpenAIModelSelection(primaryModels []string, otherModels []string)
 			prompt = "\nEnter model numbers, or 'p' to see primary models: "
 		}
 
-		log.Printf(prompt)
+		log.Print(prompt)
 		input, _ := reader.ReadString('\n')
 		input = strings.TrimSpace(input)
 

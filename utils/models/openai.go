@@ -187,7 +187,7 @@ func (o *OpenAIProvider) SendPrompt(modelName string, prompt string) (string, er
 			resp, err := client.CreateChatCompletion(context.Background(), req)
 
 			if err != nil {
-				return "", fmt.Errorf("OpenAI API error: %v", err)
+				return "", fmt.Errorf("OpenAI API error: %w", err)
 			}
 
 			if len(resp.Choices) == 0 {
@@ -244,7 +244,7 @@ func (o *OpenAIProvider) SendPromptWithFile(modelName string, prompt string, fil
 	// Read the file content with size check - do this outside the retry loop
 	fileData, err := fileutil.SafeReadFile(file.Path)
 	if err != nil {
-		return "", fmt.Errorf("failed to read file: %v", err)
+		return "", fmt.Errorf("failed to read file: %w", err)
 	}
 
 	client := openai.NewClient(o.apiKey)
@@ -272,7 +272,7 @@ func (o *OpenAIProvider) SendPromptWithFile(modelName string, prompt string, fil
 			resp, err := client.CreateChatCompletion(context.Background(), req)
 
 			if err != nil {
-				return "", fmt.Errorf("OpenAI API error: %v", err)
+				return "", fmt.Errorf("OpenAI API error: %w", err)
 			}
 
 			if len(resp.Choices) == 0 {
@@ -343,7 +343,7 @@ func (o *OpenAIProvider) handleFileAsVision(client *openai.Client, prompt string
 	resp, err := client.CreateChatCompletion(context.Background(), req)
 
 	if err != nil {
-		return "", fmt.Errorf("OpenAI Vision API error: %v", err)
+		return "", fmt.Errorf("OpenAI Vision API error: %w", err)
 	}
 
 	if len(resp.Choices) == 0 {
@@ -403,7 +403,7 @@ func (o *OpenAIProvider) handleVisionPrompt(client *openai.Client, prompt string
 	resp, err := client.CreateChatCompletion(context.Background(), req)
 
 	if err != nil {
-		return "", fmt.Errorf("OpenAI Vision API error: %v", err)
+		return "", fmt.Errorf("OpenAI Vision API error: %w", err)
 	}
 
 	if len(resp.Choices) == 0 {
